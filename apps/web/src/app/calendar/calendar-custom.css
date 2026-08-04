@@ -1,0 +1,51 @@
+/* Custom styles for React Big Calendar */
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 12px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-style: italic !important;
+  color: #064e3b !important; /* emerald-900 */
+  border-bottom: 2px solid #ecfdf5 !important;
+}
+
+.rbc-time-view {
+  border: 1px solid #f0fdf4 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+.rbc-timeslot-group {
+  min-height: 60px !important;
+  border-bottom: 1px solid #f0fdf4 !important;
+}
+
+.rbc-time-slot {
+  border-top: 1px solid #f0fdf4 !important;
+}
+
+.rbc-event {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.rbc-today {
+  background-color: #f0fdf4 !important; /* emerald-50 */
+}
+
+.rbc-current-time-indicator {
+  background-color: #10b981 !important; /* emerald-500 */
+}
+
+.rbc-agenda-view table.rbc-agenda-table {
+  border: none !important;
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+  padding: 16px !important;
+  font-weight: bold !important;
+  color: #064e3b !important;
+}

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "@crm-eye/database": ["../../packages/database/src/index.ts"],
+      "@crm-eye/shared": ["../../packages/shared/src/index.ts"],
+      "@crm-eye/ai": ["../../packages/ai/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}

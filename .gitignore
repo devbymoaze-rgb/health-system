@@ -1,0 +1,47 @@
+# dependencies
+node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+**/.next/
+/out/
+
+# production
+/build
+**/dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# whatsapp runtime files
+apps/worker/auth/
+apps/web/public/qr.png
+apps/web/public/whatsapp-qr.txt
+apps/web/public/whatsapp-reset.flag
+
+# legacy paths (if still present)
+auth/
+public/qr.png
+public/whatsapp-qr.txt
+public/whatsapp-reset.flag

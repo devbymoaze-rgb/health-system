@@ -1,0 +1,28 @@
+{
+  "name": "@crm-eye/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@crm-eye/ai": "*",
+    "@crm-eye/database": "*",
+    "@crm-eye/shared": "*",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "dotenv": "^17.3.1",
+    "mongoose": "^9.3.3",
+    "pino": "^10.3.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5"
+  }
+}

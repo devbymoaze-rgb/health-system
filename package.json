@@ -1,0 +1,25 @@
+{
+  "name": "crm-eye",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --shell powershell.exe \"npm run dev:web\" \"npm run dev:worker\"",
+    "dev:web": "npm run dev -w @crm-eye/web",
+    "dev:worker": "npm run dev -w @crm-eye/worker",
+    "build": "npm run build -w @crm-eye/web",
+    "start:web": "npm run start -w @crm-eye/web",
+    "start:worker": "npm run start -w @crm-eye/worker",
+    "lint": "npm run lint -w @crm-eye/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

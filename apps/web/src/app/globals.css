@@ -1,0 +1,53 @@
+:root {
+  --background: #f0fdf4; /* Very light mint green */
+  --foreground: #064e3b; /* Deep emerald green */
+  --sidebar: #065f46; /* Emerald green */
+  --sidebar-hover: #047857;
+  --accent: #10b981; /* Primary emerald */
+  --card: #ffffff;
+  --card-border: #d1fae5;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Prevent body scroll, use layout scroll */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0fdf4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .green-card {
+    @apply bg-white border border-emerald-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+  
+  .green-input {
+    @apply w-full bg-emerald-50/50 border border-emerald-100 rounded-xl px-4 py-3 text-emerald-900 placeholder-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all;
+  }
+
+  .green-button {
+    @apply flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-200 active:scale-95 disabled:opacity-50;
+  }
+}
