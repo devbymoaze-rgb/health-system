@@ -1,0 +1,13 @@
+# Monorepo: install and build from the repository root so workspace
+# packages (@crm-eye/database, @crm-eye/shared, @crm-eye/ai) resolve.
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm run start:web"
