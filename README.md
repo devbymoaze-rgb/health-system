@@ -83,7 +83,7 @@ Uses `railway.json` and `nixpacks.toml` automatically.
 | Setting | Value |
 |---------|-------|
 | Root Directory | *(empty — repo root)* |
-| Build Command | `npm ci && npm run build` |
+| Build Command | `npm run build` *(install runs `npm ci` automatically)* |
 | Start Command | `npm run start:web` |
 | Nixpacks Config | `nixpacks.toml` |
 
@@ -105,7 +105,7 @@ Copy settings from `railway.worker.json` and `nixpacks.worker.toml`.
 | Setting | Value |
 |---------|-------|
 | Root Directory | *(empty — repo root)* |
-| Build Command | `npm ci` |
+| Build Command | *(leave empty — install runs `npm ci` automatically)* |
 | Start Command | `npm run start:worker` |
 | Nixpacks Config | `nixpacks.worker.toml` |
 
