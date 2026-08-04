@@ -14,7 +14,7 @@
   "dependencies": {
     "@crm-eye/database": "*",
     "@crm-eye/shared": "*",
-    "openai": "^6.33.0"
+    "openai": "^6.49.0"
   },
   "devDependencies": {
     "typescript": "^5"

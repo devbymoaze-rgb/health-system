@@ -1,5 +1,4 @@
-# Monorepo: install and build from the repository root so workspace
-# packages (@crm-eye/database, @crm-eye/shared, @crm-eye/ai) resolve.
+# Web service — build from monorepo root so workspace packages resolve.
 [phases.setup]
 nixPkgs = ["nodejs_20"]
 

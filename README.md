@@ -74,26 +74,40 @@ npm run start:worker # Start WhatsApp worker
 
 ## Railway Deployment
 
-Deploy **two independent services** from the same repository:
+Deploy **two independent services** from the same repository. **Root Directory must be empty** (repo root) — do not set it to `apps/web`.
 
 ### Service 1: Web (`@crm-eye/web`)
 
+Uses `railway.json` and `nixpacks.toml` automatically.
+
 | Setting | Value |
 |---------|-------|
-| Root Directory | `/` (repo root) |
-| Build Command | `npm install && npm run build` |
+| Root Directory | *(empty — repo root)* |
+| Build Command | `npm ci && npm run build` |
 | Start Command | `npm run start:web` |
-| Port | `3000` |
+| Nixpacks Config | `nixpacks.toml` |
 
-Set all environment variables from `.env.local`. Set `GOOGLE_REDIRECT_URI` to your production URL (e.g. `https://your-app.up.railway.app/api/auth/google/callback`).
+Required environment variables:
+
+```env
+MONGODB_URI=mongodb+srv://...
+OPENAI_API_KEY=sk-...
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=https://your-app.up.railway.app/api/auth/google/callback
+GOOGLE_JAVASCRIPT_ORIGIN=https://your-app.up.railway.app
+```
 
 ### Service 2: Worker (`@crm-eye/worker`)
 
+Copy settings from `railway.worker.json` and `nixpacks.worker.toml`.
+
 | Setting | Value |
 |---------|-------|
-| Root Directory | `/` (repo root) |
-| Build Command | `npm install` |
+| Root Directory | *(empty — repo root)* |
+| Build Command | `npm ci` |
 | Start Command | `npm run start:worker` |
+| Nixpacks Config | `nixpacks.worker.toml` |
 
 Use the **same** `MONGODB_URI`, `OPENAI_API_KEY`, and Google credentials as the web service.
 

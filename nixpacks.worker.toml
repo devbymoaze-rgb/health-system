@@ -1,0 +1,9 @@
+# Worker service — install from monorepo root; no Next.js build required.
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[start]
+cmd = "npm run start:worker"
