@@ -1,5 +1,5 @@
 export * from './models';
-export { default as connectToDatabase, connectToDatabase as connect } from './connect';
+export { default as connectToDatabase, connectToDatabase as connect, isDatabaseConnected } from './connect';
 export { connectWorkerDatabase, isMockMode, patchModelsForMockMode } from './mock';
 
 // Default exports for backward compatibility with web imports

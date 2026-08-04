@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import { connectToDatabase, Doctor } from '@crm-eye/database';
+import { connectToDatabase, Doctor, isDatabaseConnected } from '@crm-eye/database';
 
 export async function GET() {
   try {
     await connectToDatabase();
-    if (mongoose.connection.readyState !== 1) {
+    if (!isDatabaseConnected()) {
       return NextResponse.json({
         name: 'Demo Doctor (DB Offline)',
         specialization: 'Eye Specialist',
@@ -28,6 +27,13 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
+    if (!isDatabaseConnected()) {
+      return NextResponse.json(
+        { error: 'Database is not connected. Please check your MONGODB_URI.' },
+        { status: 503 }
+      );
+    }
+
     const data = await req.json();
 
     let doctor = await Doctor.findOne();
