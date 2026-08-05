@@ -5,6 +5,8 @@ import { useChat } from '@/lib/use-chat';
 export function Chat() {
   const { messages, loading, sendMessage } = useChat();
 
+
+  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
