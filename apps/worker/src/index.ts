@@ -3,9 +3,8 @@ import makeWASocket, {
   fetchLatestBaileysVersion,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
-import { connectWorkerDatabase } from '@crm-eye/database';
+import { connectWorkerDatabase, Doctor, Settings } from '@crm-eye/database';
 import { buildSystemPrompt, clearAllSessions, getOpenAIResponse, startSessionCleanup } from '@crm-eye/ai';
-import { Doctor, Settings } from '@crm-eye/database';
 import { getWebPublicDir, getWorkerAuthDir, processPendingFollowUps, setWhatsAppQr, getWhatsAppResetRequestedAt, clearWhatsAppResetRequest, setWhatsAppStatus, touchWhatsAppWorker } from '@crm-eye/shared';
 import dotenv from 'dotenv';
 import fs from 'fs';

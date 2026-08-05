@@ -10,10 +10,11 @@
     "dev": "concurrently --shell powershell.exe \"npm run dev:web\" \"npm run dev:worker\"",
     "dev:web": "npm run dev -w @crm-eye/web",
     "dev:worker": "npm run dev -w @crm-eye/worker",
-    "build": "npm run build -w @crm-eye/web",
+    "build": "npm run build:packages && npm run build -w @crm-eye/worker && npm run build -w @crm-eye/web",
+    "build:packages": "npm run build -w @crm-eye/database && npm run build -w @crm-eye/shared && npm run build -w @crm-eye/ai",
     "start:web": "npm run start -w @crm-eye/web",
     "start:worker": "npm run start -w @crm-eye/worker",
-    "start:all": "npm run start:worker & npm run start:web",
+    "start:all": "sh scripts/start-all.sh",
     "lint": "npm run lint -w @crm-eye/web"
   },
   "devDependencies": {
