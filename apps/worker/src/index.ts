@@ -64,6 +64,8 @@ async function persistQrCode(publicDir: string, qr: string) {
   }
 }
 
+
+
 async function clearQrCode(publicDir: string) {
   try {
     await setWhatsAppQr(null);
