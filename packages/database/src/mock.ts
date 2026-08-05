@@ -19,6 +19,22 @@ type AnyModel = any;
 
 export function patchModelsForMockMode() {
   (Settings as AnyModel).findOne = async () => localStore.settings;
+  (Settings as AnyModel).create = async (data: Record<string, unknown>) => {
+    localStore.settings = { ...data, _id: 'mock-settings' };
+    return localStore.settings;
+  };
+  (Settings as AnyModel).findByIdAndUpdate = async (_id: unknown, update: { $set?: Record<string, unknown>; $unset?: Record<string, string> }) => {
+    localStore.settings = { ...(localStore.settings || { autoResponseEnabled: true }) };
+    if (update.$set) {
+      localStore.settings = { ...localStore.settings, ...update.$set };
+    }
+    if (update.$unset) {
+      for (const key of Object.keys(update.$unset)) {
+        delete localStore.settings[key];
+      }
+    }
+    return localStore.settings;
+  };
   (Settings as AnyModel).prototype.save = async function (this: Record<string, unknown>) {
     localStore.settings = this;
   };

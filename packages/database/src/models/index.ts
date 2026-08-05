@@ -6,6 +6,9 @@ export interface ISettings extends Document {
   autoResponseEnabled: boolean;
   whatsappQr?: string;
   whatsappResetRequestedAt?: Date;
+  whatsappStatus?: 'disconnected' | 'qr_pending' | 'connected';
+  whatsappWorkerSeenAt?: Date;
+  whatsappQrUpdatedAt?: Date;
   googleTokens?: {
     access_token?: string;
     refresh_token?: string;
@@ -21,6 +24,9 @@ const SettingsSchema: Schema = new Schema({
   autoResponseEnabled: { type: Boolean, default: true },
   whatsappQr: { type: String },
   whatsappResetRequestedAt: { type: Date },
+  whatsappStatus: { type: String, enum: ['disconnected', 'qr_pending', 'connected'], default: 'disconnected' },
+  whatsappWorkerSeenAt: { type: Date },
+  whatsappQrUpdatedAt: { type: Date },
   googleTokens: {
     access_token: String,
     refresh_token: String,

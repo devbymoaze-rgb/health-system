@@ -6,7 +6,7 @@ import makeWASocket, {
 import { connectWorkerDatabase } from '@crm-eye/database';
 import { buildSystemPrompt, clearAllSessions, getOpenAIResponse, startSessionCleanup } from '@crm-eye/ai';
 import { Doctor, Settings } from '@crm-eye/database';
-import { getWebPublicDir, getWorkerAuthDir, processPendingFollowUps, setWhatsAppQr, getWhatsAppResetRequestedAt, clearWhatsAppResetRequest } from '@crm-eye/shared';
+import { getWebPublicDir, getWorkerAuthDir, processPendingFollowUps, setWhatsAppQr, getWhatsAppResetRequestedAt, clearWhatsAppResetRequest, setWhatsAppStatus, touchWhatsAppWorker } from '@crm-eye/shared';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -82,6 +82,20 @@ function clearAuthDir() {
   }
 }
 
+function startWorkerHeartbeat() {
+  const sendHeartbeat = async () => {
+    try {
+      await touchWhatsAppWorker();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.warn(`Worker heartbeat failed: ${message}`);
+    }
+  };
+
+  void sendHeartbeat();
+  setInterval(sendHeartbeat, 15_000);
+}
+
 function startFollowUpChecker() {
   if (followUpIntervalId) clearInterval(followUpIntervalId);
   followUpIntervalId = setInterval(async () => {
@@ -137,6 +151,12 @@ async function startWhatsApp() {
     if (connection === 'open') {
       logger.info('✅ WhatsApp Connected!');
       await clearQrCode(publicDir);
+      try {
+        await setWhatsAppStatus('connected');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.warn(`Could not update WhatsApp status: ${message}`);
+      }
     }
   });
 
@@ -228,6 +248,7 @@ function startResetWatcher() {
 async function main() {
   startSessionCleanup(logger);
   await connectWorkerDatabase(logger);
+  startWorkerHeartbeat();
   startResetWatcher();
   await startWhatsApp();
 }
