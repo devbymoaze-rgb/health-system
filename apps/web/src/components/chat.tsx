@@ -6,8 +6,11 @@ export function Chat() {
   const { messages, loading, sendMessage } = useChat();
 
 
-  
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+    
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const message = formData.get('message') as string;
