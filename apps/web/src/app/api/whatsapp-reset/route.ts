@@ -1,28 +1,26 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { getWorkerAuthDirFromWeb } from '@crm-eye/shared';
+import { connectToDatabase, isDatabaseConnected } from '@crm-eye/database';
+import { requestWhatsAppReset } from '@crm-eye/shared';
 
 export async function POST() {
   try {
-    const authPath = getWorkerAuthDirFromWeb();
-    const qrTxtPath = path.join(process.cwd(), 'public', 'whatsapp-qr.txt');
-    const qrPngPath = path.join(process.cwd(), 'public', 'qr.png');
-
-    if (fs.existsSync(authPath)) {
-      fs.rmSync(authPath, { recursive: true, force: true });
+    await connectToDatabase();
+    if (!isDatabaseConnected()) {
+      return NextResponse.json(
+        { error: 'Database is not connected. Please check your MONGODB_URI.' },
+        { status: 503 }
+      );
     }
 
-    if (fs.existsSync(qrTxtPath)) fs.unlinkSync(qrTxtPath);
-    if (fs.existsSync(qrPngPath)) fs.unlinkSync(qrPngPath);
+    await requestWhatsAppReset();
 
-    const resetFlag = path.join(process.cwd(), 'public', 'whatsapp-reset.flag');
-    fs.writeFileSync(resetFlag, 'reset');
-
-    return NextResponse.json({ success: true, message: 'Session reset. A new QR code will be generated.' });
+    return NextResponse.json({
+      success: true,
+      message: 'Session reset. A new QR code will be generated.',
+    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('Reset WhatsApp error:', error);
+    console.error('POST /api/whatsapp-reset error:', message);
     return NextResponse.json({ error: 'Failed to reset session', details: message }, { status: 500 });
   }
 }

@@ -4,6 +4,8 @@ export interface ISettings extends Document {
   openaiApiKey?: string;
   whatsappNumber?: string;
   autoResponseEnabled: boolean;
+  whatsappQr?: string;
+  whatsappResetRequestedAt?: Date;
   googleTokens?: {
     access_token?: string;
     refresh_token?: string;
@@ -17,6 +19,8 @@ const SettingsSchema: Schema = new Schema({
   openaiApiKey: { type: String },
   whatsappNumber: { type: String },
   autoResponseEnabled: { type: Boolean, default: true },
+  whatsappQr: { type: String },
+  whatsappResetRequestedAt: { type: Date },
   googleTokens: {
     access_token: String,
     refresh_token: String,

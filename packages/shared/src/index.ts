@@ -4,3 +4,4 @@ export { type Logger } from './google';
 export * from './google';
 export * from './appointments';
 export * from './followups';
+export * from './whatsapp';

@@ -6,7 +6,7 @@ import makeWASocket, {
 import { connectWorkerDatabase } from '@crm-eye/database';
 import { buildSystemPrompt, clearAllSessions, getOpenAIResponse, startSessionCleanup } from '@crm-eye/ai';
 import { Doctor, Settings } from '@crm-eye/database';
-import { getWebPublicDir, getWorkerAuthDir, processPendingFollowUps } from '@crm-eye/shared';
+import { getWebPublicDir, getWorkerAuthDir, processPendingFollowUps, setWhatsAppQr, getWhatsAppResetRequestedAt, clearWhatsAppResetRequest } from '@crm-eye/shared';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -24,6 +24,7 @@ const logger = pino({ level: 'info' });
 
 let activeSock: ReturnType<typeof makeWASocket> | null = null;
 let followUpIntervalId: ReturnType<typeof setInterval> | null = null;
+let lastHandledResetAt: Date | null = null;
 
 function getPublicDir() {
   return getWebPublicDir();
@@ -31,6 +32,54 @@ function getPublicDir() {
 
 function getAuthDir() {
   return getWorkerAuthDir();
+}
+
+function clearLocalQrFiles(publicDir: string) {
+  const qrPngPath = path.join(publicDir, 'qr.png');
+  const qrTxtPath = path.join(publicDir, 'whatsapp-qr.txt');
+  [qrPngPath, qrTxtPath].forEach((filePath) => {
+    try {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+async function persistQrCode(publicDir: string, qr: string) {
+  try {
+    await setWhatsAppQr(qr);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.warn(`Could not persist QR to database: ${message}`);
+  }
+
+  try {
+    if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+    await QRCode.toFile(path.join(publicDir, 'qr.png'), qr);
+    fs.writeFileSync(path.join(publicDir, 'whatsapp-qr.txt'), qr);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.warn(`Could not persist QR to filesystem: ${message}`);
+  }
+}
+
+async function clearQrCode(publicDir: string) {
+  try {
+    await setWhatsAppQr(null);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.warn(`Could not clear QR in database: ${message}`);
+  }
+
+  clearLocalQrFiles(publicDir);
+}
+
+function clearAuthDir() {
+  const authDir = getAuthDir();
+  if (fs.existsSync(authDir)) {
+    fs.rmSync(authDir, { recursive: true, force: true });
+  }
 }
 
 function startFollowUpChecker() {
@@ -65,13 +114,9 @@ async function startWhatsApp() {
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
     const publicDir = getPublicDir();
-    const qrPngPath = path.join(publicDir, 'qr.png');
-    const qrTxtPath = path.join(publicDir, 'whatsapp-qr.txt');
 
     if (qr) {
-      if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-      await QRCode.toFile(qrPngPath, qr);
-      fs.writeFileSync(qrTxtPath, qr);
+      await persistQrCode(publicDir, qr);
       const port = process.env.PORT || '3000';
       logger.info(`📱 QR Generated → http://localhost:${port}/whatsapp`);
     }
@@ -83,13 +128,7 @@ async function startWhatsApp() {
         setTimeout(startWhatsApp, 3000);
       } else {
         logger.warn('❌ Logged out. Starting fresh for new QR...');
-        [qrPngPath, qrTxtPath].forEach((f) => {
-          try {
-            if (fs.existsSync(f)) fs.unlinkSync(f);
-          } catch {
-            /* ignore */
-          }
-        });
+        await clearQrCode(publicDir);
         clearAllSessions();
         setTimeout(startWhatsApp, 3000);
       }
@@ -97,13 +136,7 @@ async function startWhatsApp() {
 
     if (connection === 'open') {
       logger.info('✅ WhatsApp Connected!');
-      [qrPngPath, qrTxtPath].forEach((f) => {
-        try {
-          if (fs.existsSync(f)) fs.unlinkSync(f);
-        } catch {
-          /* ignore */
-        }
-      });
+      await clearQrCode(publicDir);
     }
   });
 
@@ -152,19 +185,42 @@ async function startWhatsApp() {
 }
 
 function startResetWatcher() {
-  const resetFlag = path.join(getPublicDir(), 'whatsapp-reset.flag');
-  setInterval(() => {
-    if (fs.existsSync(resetFlag)) {
-      logger.info('🔄 Reset signal detected. Logging out...');
+  setInterval(async () => {
+    try {
+      let requestedAt: Date | null = null;
+
       try {
-        fs.unlinkSync(resetFlag);
-        if (activeSock) {
-          activeSock.logout().catch((err) => logger.error(`Logout error: ${err.message}`));
+        requestedAt = await getWhatsAppResetRequestedAt();
+      } catch {
+        const resetFlag = path.join(getPublicDir(), 'whatsapp-reset.flag');
+        if (fs.existsSync(resetFlag)) {
+          requestedAt = new Date();
+          fs.unlinkSync(resetFlag);
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        logger.error(`Error handling reset flag: ${message}`);
       }
+
+      if (!requestedAt) return;
+      if (lastHandledResetAt && requestedAt <= lastHandledResetAt) return;
+
+      lastHandledResetAt = requestedAt;
+      logger.info('🔄 Reset signal detected. Logging out...');
+
+      clearAuthDir();
+      await clearQrCode(getPublicDir());
+      clearAllSessions();
+
+      if (activeSock) {
+        activeSock.logout().catch((err) => logger.error(`Logout error: ${err.message}`));
+      }
+
+      try {
+        await clearWhatsAppResetRequest();
+      } catch {
+        /* ignore when database is unavailable */
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error(`Error handling reset request: ${message}`);
     }
   }, 2000);
 }

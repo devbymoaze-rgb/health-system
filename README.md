@@ -111,25 +111,21 @@ Copy settings from `railway.worker.json` and `nixpacks.worker.toml`.
 
 Use the **same** `MONGODB_URI`, `OPENAI_API_KEY`, and Google credentials as the web service.
 
-Set path variables so the worker can communicate with the web app:
+Set path variables on the worker if you want local filesystem backups for QR files:
 
 ```env
 WEB_PUBLIC_DIR=/app/apps/web/public
 WORKER_AUTH_DIR=/app/apps/worker/auth
 ```
 
-> The worker writes QR codes to `apps/web/public/` and the web API reads them from there. Both services must share the same filesystem paths or use the env overrides above.
-
-### Shared Volume (recommended for production)
-
-Mount a shared volume at `apps/web/public` so the worker can write QR files and reset flags that the web service reads.
+> QR codes and reset signals are stored in MongoDB so the web and worker services can communicate across separate Railway containers.
 
 ## Architecture
 
 - **Web** — Next.js 15 dashboard, cookie auth, REST API routes
 - **Worker** — Standalone Node process using Baileys for WhatsApp, OpenAI for auto-replies
 - **Database** — Shared Mongoose models used by both services
-- **IPC** — Filesystem flags in `public/` (`whatsapp-qr.txt`, `whatsapp-reset.flag`)
+- **IPC** — MongoDB fields on `Settings` (`whatsappQr`, `whatsappResetRequestedAt`) for web ↔ worker communication
 
 ## Packages
 
