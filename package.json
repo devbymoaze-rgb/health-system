@@ -13,6 +13,7 @@
     "build": "npm run build -w @crm-eye/web",
     "start:web": "npm run start -w @crm-eye/web",
     "start:worker": "npm run start -w @crm-eye/worker",
+    "start:all": "npm run start:worker & npm run start:web",
     "lint": "npm run lint -w @crm-eye/web"
   },
   "devDependencies": {

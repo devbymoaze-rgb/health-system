@@ -74,23 +74,22 @@ npm run start:worker # Start WhatsApp worker
 
 ## Railway Deployment
 
-Deploy **two independent services** from the same repository. **Root Directory must be empty** (repo root) — do not set it to `apps/web`.
+Deploy from the **repository root** (Root Directory must be empty — do not set it to `apps/web`).
 
-### Service 1: Web (`@crm-eye/web`)
+### Recommended: Single service (web + worker together)
 
-Uses `railway.json` and `nixpacks.toml` automatically.
+Uses `railway.json` and `nixpacks.toml` automatically. Both Next.js and the WhatsApp worker run in one container.
 
 | Setting | Value |
 |---------|-------|
 | Root Directory | *(empty — repo root)* |
-| Build Command | `npm run build` *(install runs `npm ci` automatically)* |
-| Start Command | `npm run start:web` |
-| Nixpacks Config | `nixpacks.toml` |
+| Build Command | `npm run build` |
+| Start Command | `npm run start:all` |
 
 Required environment variables:
 
 ```env
-MONGODB_URI=mongodb+srv://...
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/moazbackend?appName=YourApp
 OPENAI_API_KEY=sk-...
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
@@ -98,27 +97,16 @@ GOOGLE_REDIRECT_URI=https://your-app.up.railway.app/api/auth/google/callback
 GOOGLE_JAVASCRIPT_ORIGIN=https://your-app.up.railway.app
 ```
 
-### Service 2: Worker (`@crm-eye/worker`)
+> Include a database name in `MONGODB_URI` (e.g. `/moazbackend`). If omitted, the app defaults to `moazbackend`.
 
-Copy settings from `railway.worker.json` and `nixpacks.worker.toml`.
+### Optional: Two separate services
 
-| Setting | Value |
-|---------|-------|
-| Root Directory | *(empty — repo root)* |
-| Build Command | *(leave empty — install runs `npm ci` automatically)* |
-| Start Command | `npm run start:worker` |
-| Nixpacks Config | `nixpacks.worker.toml` |
+Only use this if you need to scale web and worker independently.
 
-Use the **same** `MONGODB_URI`, `OPENAI_API_KEY`, and Google credentials as the web service.
+**Web service** — Start Command: `npm run start:web`  
+**Worker service** — Start Command: `npm run start:worker`, Nixpacks Config: `nixpacks.worker.toml`
 
-Set path variables on the worker if you want local filesystem backups for QR files:
-
-```env
-WEB_PUBLIC_DIR=/app/apps/web/public
-WORKER_AUTH_DIR=/app/apps/worker/auth
-```
-
-> QR codes and reset signals are stored in MongoDB so the web and worker services can communicate across separate Railway containers.
+Both services need the **same** `MONGODB_URI` and `OPENAI_API_KEY`.
 
 ## Architecture
 

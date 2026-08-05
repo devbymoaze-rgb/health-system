@@ -6,7 +6,7 @@
     "nixpacksConfigPath": "nixpacks.toml"
   },
   "deploy": {
-    "startCommand": "npm run start:web",
+    "startCommand": "npm run start:all",
     "healthcheckPath": "/login",
     "healthcheckTimeout": 300,
     "numReplicas": 1,

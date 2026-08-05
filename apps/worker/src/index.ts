@@ -86,9 +86,10 @@ function startWorkerHeartbeat() {
   const sendHeartbeat = async () => {
     try {
       await touchWhatsAppWorker();
+      logger.info('💓 Worker heartbeat sent');
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      logger.warn(`Worker heartbeat failed: ${message}`);
+      logger.error(`Worker heartbeat failed: ${message}`);
     }
   };
 

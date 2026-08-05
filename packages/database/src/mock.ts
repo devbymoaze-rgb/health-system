@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import { Appointment, Doctor, FollowUp, Settings } from './models';
+import connectToDatabase, { isDatabaseConnected } from './connect';
 
 const localStore = {
   settings: null as Record<string, unknown> | null,
@@ -138,10 +138,11 @@ export async function connectWorkerDatabase(logger: {
   error: (msg: string) => void;
   warn: (msg: string) => void;
 }) {
-  const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/moazbackend';
-
   try {
-    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
+    await connectToDatabase();
+    if (!isDatabaseConnected()) {
+      throw new Error('MongoDB connection is not ready');
+    }
     logger.info('✅ MongoDB Connected');
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

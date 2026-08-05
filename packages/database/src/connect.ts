@@ -1,12 +1,22 @@
 import mongoose from 'mongoose';
 
+function normalizeMongoUri(uri: string): string {
+  const defaultDb = process.env.MONGODB_DB_NAME || 'moazbackend';
+
+  if (uri.includes('mongodb+srv://') && !/\.mongodb\.net\/[^/?]+/.test(uri)) {
+    return uri.replace(/\.mongodb\.net\/(\?|$)/, `.mongodb.net/${defaultDb}$1`);
+  }
+
+  return uri;
+}
+
 function getMongoUri(): string {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
     console.warn('MONGODB_URI is not defined in environment variables. Falling back to local database.');
     return 'mongodb://localhost:27017/moazbackend';
   }
-  return uri;
+  return normalizeMongoUri(uri);
 }
 
 type MongooseCache = {

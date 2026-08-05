@@ -9,7 +9,7 @@ export type WhatsAppState = {
   workerActive: boolean;
 };
 
-const WORKER_STALE_MS = 60_000;
+const WORKER_STALE_MS = 120_000;
 
 async function ensureDatabase() {
   await connectToDatabase();
